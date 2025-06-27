@@ -18,6 +18,7 @@ import { ViewContactModal } from "@/components/modals/ViewContactModal";
 import { ViewLeadModal } from "@/components/modals/ViewLeadModal";
 import { ViewOpportunityModal } from "@/components/modals/ViewOpportunityModal";
 import { ViewAccountModal } from "@/components/modals/ViewAccountModal";
+import { ViewCommunicationModal } from "@/components/modals/ViewCommunicationModal";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -51,6 +52,10 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   
   const [isSMSModalOpen, setIsSMSModalOpen] = useState(false);
   const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
+  
+  // Communication modal state
+  const [isViewCommunicationModalOpen, setIsViewCommunicationModalOpen] = useState(false);
+  const [viewCommunication, setViewCommunication] = useState(null);
 
   // Create a context or props to pass modal handlers down
   const childrenWithProps = React.cloneElement(children as React.ReactElement, {
@@ -92,6 +97,10 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
     },
     onOpenSMSModal: () => setIsSMSModalOpen(true),
     onOpenEmailModal: () => setIsEmailModalOpen(true),
+    onOpenViewCommunicationModal: (communication) => {
+      setViewCommunication(communication);
+      setIsViewCommunicationModalOpen(true);
+    },
   });
 
   return (
@@ -218,6 +227,20 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         <EmailModal 
           isOpen={isEmailModalOpen} 
           onClose={() => setIsEmailModalOpen(false)} 
+        />
+        
+        {/* Communication View Modal */}
+        <ViewCommunicationModal
+          open={isViewCommunicationModalOpen}
+          onClose={() => {
+            setIsViewCommunicationModalOpen(false);
+            setViewCommunication(null);
+          }}
+          communication={viewCommunication}
+          onEdit={() => {
+            setIsViewCommunicationModalOpen(false);
+            // Handle edit functionality here if needed
+          }}
         />
         
         {/* ChatBot */}
