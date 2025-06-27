@@ -1,11 +1,10 @@
+
 import React, { useState } from 'react';
-import { Layout } from '@/components/Layout';
 import { Search, Filter, MoreHorizontal, Eye, Reply, MessageSquare, Mail, Phone, Send } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { ViewCommunicationModal } from '@/components/modals/ViewCommunicationModal';
 
 interface CommunicationsProps {
   onOpenContactModal?: () => void;
@@ -14,6 +13,7 @@ interface CommunicationsProps {
   onOpenAccountModal?: () => void;
   onOpenSMSModal?: () => void;
   onOpenEmailModal?: () => void;
+  onOpenViewCommunicationModal?: (communication: any) => void;
 }
 
 const fakeCommunications = [
@@ -85,12 +85,11 @@ const Communications: React.FC<CommunicationsProps> = ({
   onOpenOpportunityModal,
   onOpenAccountModal,
   onOpenSMSModal,
-  onOpenEmailModal
+  onOpenEmailModal,
+  onOpenViewCommunicationModal
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState('all');
-  const [viewCommunication, setViewCommunication] = useState(null);
-  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
 
   const filteredCommunications = fakeCommunications.filter(comm => {
     const matchesSearch = comm.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -101,14 +100,9 @@ const Communications: React.FC<CommunicationsProps> = ({
   });
 
   const handleViewCommunication = (communication: any) => {
-    setViewCommunication(communication);
-    setIsViewModalOpen(true);
-  };
-
-  const handleEditCommunication = () => {
-    // Placeholder for edit functionality
-    console.log('Edit communication:', viewCommunication);
-    setIsViewModalOpen(false);
+    if (onOpenViewCommunicationModal) {
+      onOpenViewCommunicationModal(communication);
+    }
   };
 
   const getTypeIcon = (type: string) => {
@@ -145,196 +139,184 @@ const Communications: React.FC<CommunicationsProps> = ({
   };
 
   return (
-    <Layout>
-      <div className="p-6 space-y-6">
-        {/* Header */}
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Communications</h1>
-            <p className="text-gray-600 mt-1">Track all customer interactions and communications</p>
-          </div>
-          <div className="flex space-x-2">
-            <Button 
-              onClick={onOpenSMSModal}
-              className="bg-green-600 hover:bg-green-700 text-white"
-            >
-              <MessageSquare className="w-4 h-4 mr-2" />
-              Send SMS
-            </Button>
-            <Button 
-              onClick={onOpenEmailModal}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
-            >
-              <Mail className="w-4 h-4 mr-2" />
-              Send Email
-            </Button>
-          </div>
+    <div className="p-6 space-y-6">
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Communications</h1>
+          <p className="text-gray-600 mt-1">Track all customer interactions and communications</p>
         </div>
-
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
-                <Mail className="w-4 h-4" />
-                Emails Sent
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-gray-900">24</div>
-              <p className="text-sm text-green-600">+6 this week</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
-                <Phone className="w-4 h-4" />
-                Calls Made
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-gray-900">15</div>
-              <p className="text-sm text-blue-600">80% connection rate</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
-                <MessageSquare className="w-4 h-4" />
-                SMS Sent
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-gray-900">8</div>
-              <p className="text-sm text-green-600">100% delivery rate</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
-                <Send className="w-4 h-4" />
-                Response Rate
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-gray-900">65%</div>
-              <p className="text-sm text-green-600">Above average</p>
-            </CardContent>
-          </Card>
+        <div className="flex space-x-2">
+          <Button 
+            onClick={onOpenSMSModal}
+            className="bg-green-600 hover:bg-green-700 text-white"
+          >
+            <MessageSquare className="w-4 h-4 mr-2" />
+            Send SMS
+          </Button>
+          <Button 
+            onClick={onOpenEmailModal}
+            className="bg-blue-600 hover:bg-blue-700 text-white"
+          >
+            <Mail className="w-4 h-4 mr-2" />
+            Send Email
+          </Button>
         </div>
+      </div>
 
-        {/* Filters and Search */}
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card>
-          <CardHeader>
-            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-              <CardTitle>Communication History</CardTitle>
-              <div className="flex gap-2 w-full sm:w-auto">
-                <div className="relative flex-1 sm:flex-initial">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                  <input
-                    type="text"
-                    placeholder="Search communications..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-64"
-                  />
-                </div>
-                <select
-                  value={filterType}
-                  onChange={(e) => setFilterType(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="all">All Types</option>
-                  <option value="email">Email</option>
-                  <option value="phone">Phone</option>
-                  <option value="sms">SMS</option>
-                </select>
-              </div>
-            </div>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
+              <Mail className="w-4 h-4" />
+              Emails Sent
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Subject</TableHead>
-                    <TableHead>Contact</TableHead>
-                    <TableHead>Company</TableHead>
-                    <TableHead>Direction</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Assigned To</TableHead>
-                    <TableHead className="w-[100px]">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredCommunications.map((communication) => (
-                    <TableRow key={communication.id} className="hover:bg-gray-50">
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <Badge className={getTypeColor(communication.type)}>
-                            {getTypeIcon(communication.type)}
-                            <span className="ml-1 capitalize">{communication.type}</span>
-                          </Badge>
-                        </div>
-                      </TableCell>
-                      <TableCell className="font-medium">{communication.subject}</TableCell>
-                      <TableCell>{communication.contact}</TableCell>
-                      <TableCell>{communication.company}</TableCell>
-                      <TableCell>
-                        <Badge className={getDirectionColor(communication.direction)}>
-                          {communication.direction}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge className={getStatusColor(communication.status)}>
-                          {communication.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>{communication.date}</TableCell>
-                      <TableCell>{communication.assignedTo}</TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <Button 
-                            variant="ghost" 
-                            size="sm"
-                            onClick={() => handleViewCommunication(communication)}
-                          >
-                            <Eye className="w-4 h-4" />
-                          </Button>
-                          <Button variant="ghost" size="sm">
-                            <Reply className="w-4 h-4" />
-                          </Button>
-                          <Button variant="ghost" size="sm">
-                            <MoreHorizontal className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-            {filteredCommunications.length === 0 && (
-              <div className="text-center py-8 text-gray-500">
-                No communications found matching your criteria.
-              </div>
-            )}
+            <div className="text-2xl font-bold text-gray-900">24</div>
+            <p className="text-sm text-green-600">+6 this week</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
+              <Phone className="w-4 h-4" />
+              Calls Made
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-gray-900">15</div>
+            <p className="text-sm text-blue-600">80% connection rate</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
+              <MessageSquare className="w-4 h-4" />
+              SMS Sent
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-gray-900">8</div>
+            <p className="text-sm text-green-600">100% delivery rate</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-gray-600 flex items-center gap-2">
+              <Send className="w-4 h-4" />
+              Response Rate
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-gray-900">65%</div>
+            <p className="text-sm text-green-600">Above average</p>
           </CardContent>
         </Card>
       </div>
 
-      <ViewCommunicationModal
-        open={isViewModalOpen}
-        onClose={() => {
-          setIsViewModalOpen(false);
-          setViewCommunication(null);
-        }}
-        communication={viewCommunication}
-        onEdit={handleEditCommunication}
-      />
-    </Layout>
+      {/* Filters and Search */}
+      <Card>
+        <CardHeader>
+          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+            <CardTitle>Communication History</CardTitle>
+            <div className="flex gap-2 w-full sm:w-auto">
+              <div className="relative flex-1 sm:flex-initial">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <input
+                  type="text"
+                  placeholder="Search communications..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-64"
+                />
+              </div>
+              <select
+                value={filterType}
+                onChange={(e) => setFilterType(e.target.value)}
+                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="all">All Types</option>
+                <option value="email">Email</option>
+                <option value="phone">Phone</option>
+                <option value="sms">SMS</option>
+              </select>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Subject</TableHead>
+                  <TableHead>Contact</TableHead>
+                  <TableHead>Company</TableHead>
+                  <TableHead>Direction</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Assigned To</TableHead>
+                  <TableHead className="w-[100px]">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredCommunications.map((communication) => (
+                  <TableRow key={communication.id} className="hover:bg-gray-50">
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Badge className={getTypeColor(communication.type)}>
+                          {getTypeIcon(communication.type)}
+                          <span className="ml-1 capitalize">{communication.type}</span>
+                        </Badge>
+                      </div>
+                    </TableCell>
+                    <TableCell className="font-medium">{communication.subject}</TableCell>
+                    <TableCell>{communication.contact}</TableCell>
+                    <TableCell>{communication.company}</TableCell>
+                    <TableCell>
+                      <Badge className={getDirectionColor(communication.direction)}>
+                        {communication.direction}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Badge className={getStatusColor(communication.status)}>
+                        {communication.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>{communication.date}</TableCell>
+                    <TableCell>{communication.assignedTo}</TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => handleViewCommunication(communication)}
+                        >
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                        <Button variant="ghost" size="sm">
+                          <Reply className="w-4 h-4" />
+                        </Button>
+                        <Button variant="ghost" size="sm">
+                          <MoreHorizontal className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+          {filteredCommunications.length === 0 && (
+            <div className="text-center py-8 text-gray-500">
+              No communications found matching your criteria.
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 
