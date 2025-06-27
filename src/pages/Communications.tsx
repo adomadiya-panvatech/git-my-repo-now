@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Layout } from '@/components/Layout';
 import { Search, Filter, MoreHorizontal, Eye, Reply, MessageSquare, Mail, Phone, Send } from 'lucide-react';
@@ -6,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { ViewCommunicationModal } from '@/components/modals/ViewCommunicationModal';
 
 interface CommunicationsProps {
   onOpenContactModal?: () => void;
@@ -26,7 +26,7 @@ const fakeCommunications = [
     direction: 'outbound',
     status: 'sent',
     date: '2024-01-15 10:30 AM',
-    content: 'Thank you for your time during our product demo. I wanted to follow up...',
+    content: 'Thank you for your time during our product demo. I wanted to follow up and see if you have any questions about our solution. We believe our platform could significantly improve your workflow efficiency.',
     assignedTo: 'Sarah Johnson'
   },
   {
@@ -38,7 +38,7 @@ const fakeCommunications = [
     direction: 'inbound',
     status: 'completed',
     date: '2024-01-15 2:15 PM',
-    content: 'Discussion about security requirements and compliance needs',
+    content: 'Discussion about security requirements and compliance needs. Customer is interested in our enterprise security features and wants to schedule a technical review.',
     assignedTo: 'Mike Davis'
   },
   {
@@ -50,7 +50,7 @@ const fakeCommunications = [
     direction: 'outbound',
     status: 'delivered',
     date: '2024-01-14 9:00 AM',
-    content: 'Hi Alex, just a quick reminder about our meeting tomorrow at 2 PM.',
+    content: 'Hi Alex, just a quick reminder about our meeting tomorrow at 2 PM. Looking forward to discussing your project requirements.',
     assignedTo: 'John Smith'
   },
   {
@@ -62,7 +62,7 @@ const fakeCommunications = [
     direction: 'outbound',
     status: 'opened',
     date: '2024-01-13 4:45 PM',
-    content: 'Please find attached our comprehensive proposal for your cloud migration project...',
+    content: 'Please find attached our comprehensive proposal for your cloud migration project. We have included detailed timelines, pricing, and implementation strategies.',
     assignedTo: 'Sarah Johnson'
   },
   {
@@ -74,7 +74,7 @@ const fakeCommunications = [
     direction: 'inbound',
     status: 'missed',
     date: '2024-01-12 11:20 AM',
-    content: 'Customer called regarding integration questions',
+    content: 'Customer called regarding integration questions. Need to follow up on API documentation and provide technical support.',
     assignedTo: 'Emily Chen'
   }
 ];
@@ -89,6 +89,8 @@ const Communications: React.FC<CommunicationsProps> = ({
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState('all');
+  const [viewCommunication, setViewCommunication] = useState(null);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
 
   const filteredCommunications = fakeCommunications.filter(comm => {
     const matchesSearch = comm.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -97,6 +99,17 @@ const Communications: React.FC<CommunicationsProps> = ({
     const matchesFilter = filterType === 'all' || comm.type.toLowerCase() === filterType.toLowerCase();
     return matchesSearch && matchesFilter;
   });
+
+  const handleViewCommunication = (communication: any) => {
+    setViewCommunication(communication);
+    setIsViewModalOpen(true);
+  };
+
+  const handleEditCommunication = () => {
+    // Placeholder for edit functionality
+    console.log('Edit communication:', viewCommunication);
+    setIsViewModalOpen(false);
+  };
 
   const getTypeIcon = (type: string) => {
     switch (type) {
@@ -283,7 +296,11 @@ const Communications: React.FC<CommunicationsProps> = ({
                       <TableCell>{communication.assignedTo}</TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <Button variant="ghost" size="sm">
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => handleViewCommunication(communication)}
+                          >
                             <Eye className="w-4 h-4" />
                           </Button>
                           <Button variant="ghost" size="sm">
@@ -307,6 +324,16 @@ const Communications: React.FC<CommunicationsProps> = ({
           </CardContent>
         </Card>
       </div>
+
+      <ViewCommunicationModal
+        open={isViewModalOpen}
+        onClose={() => {
+          setIsViewModalOpen(false);
+          setViewCommunication(null);
+        }}
+        communication={viewCommunication}
+        onEdit={handleEditCommunication}
+      />
     </Layout>
   );
 };
